@@ -23,7 +23,7 @@ void MeshObstaclePlanner::addMeshObstacle()
     obj.id = "mesh_obstacle";
 
     const std::string mesh_resource =
-        "package://mesh_obstacle_planner/meshes/obstacle_mitsubishi_meters.stl";
+        "package://mesh_obstacle_planner/meshes/obstacle.stl";
 
     std::unique_ptr<shapes::Mesh> mesh(
         shapes::createMeshFromResource(mesh_resource));
