@@ -4,24 +4,14 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 
-#include <moveit_msgs/msg/collision_object.hpp>
-#include <moveit_msgs/msg/display_trajectory.hpp>
-
-#include <geometric_shapes/shape_operations.h>
-#include <geometric_shapes/mesh_operations.h>
-
-#include <shape_msgs/msg/mesh.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-
-#include <moveit/planning_scene_interface/planning_scene_interface.h>
-#include <moveit/move_group_interface/move_group_interface.h>
-
+// INSERT INCLUDES HERE
 
 class MeshObstaclePlanner : public rclcpp::Node
 {
 public:
     /**
      * Main constructor
+     * sets up the publisher for the /display_planned_path topic
      */
     MeshObstaclePlanner();
 
@@ -30,27 +20,49 @@ public:
      */
     ~MeshObstaclePlanner() = default;
 
+    /**
+     * main robot motion code
+     */
     void mainRobotMotion();
 
+    /**
+     * initializes the movegroup
+     * sets the max planning time
+     * sets the max number of planning attempts
+     */
     void initMoveGroup();
 
+    /**
+     * adds mesh collision object
+     */
     void addMeshObstacle();
 
+    /**
+     * plan a path to the input joint angles
+     * if successful, visualize the path plan by publishing to the /display_planned_path topic
+     * @param joints The target joint angles
+     * @return true if the plan succeeds
+     */
     bool planMotionAndVisualize(std::vector<double> & joints);
 
+    /**
+     * execute the computed path plan
+     */
     void moveJoints();
     
 private:
 
-    moveit::planning_interface::PlanningSceneInterface psi_;
+    // insert planning scene interface here
 
-    moveit::planning_interface::MoveGroupInterface::Plan plan_;
-    std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_;
-    std::vector<double> start_joints_ = {-M_PI/2.0, M_PI/4.0,  0.0, 0.0, 0.0, 0.0};
-    std::vector<double> goal_joints_ = {M_PI/2.0, M_PI/2.0,  0.0, 0.0, 0.0, 0.0};
-
-    rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>::SharedPtr display_pub_;
+    // insert path plan object here
     
+    // insert move group object here
+    
+    // insert starting joint angles here
+    
+    // insert goal joint angles here
+    
+    // insert publisher for /display_planned_path topic here
 };
 
 #endif // MESH_OBSTACLE_PLANNER
