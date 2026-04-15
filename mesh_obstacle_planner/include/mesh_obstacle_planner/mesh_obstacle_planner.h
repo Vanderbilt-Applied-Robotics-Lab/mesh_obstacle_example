@@ -30,11 +30,13 @@ public:
      */
     ~MeshObstaclePlanner() = default;
 
+    void mainRobotMotion();
+
     void initMoveGroup();
 
     void addMeshObstacle();
 
-    bool planMotionAndVisualize();
+    bool planMotionAndVisualize(std::vector<double> & joints);
 
     void moveJoints();
     
@@ -44,10 +46,10 @@ private:
 
     moveit::planning_interface::MoveGroupInterface::Plan plan_;
     std::shared_ptr<moveit::planning_interface::MoveGroupInterface> move_group_;
-    std::vector<double> target_joints_ = {M_PI/2.0, 0.0,  0.0, 0.0, 0.0, 0.0};
+    std::vector<double> start_joints_ = {-M_PI/2.0, M_PI/4.0,  0.0, 0.0, 0.0, 0.0};
+    std::vector<double> goal_joints_ = {M_PI/2.0, M_PI/2.0,  0.0, 0.0, 0.0, 0.0};
 
     rclcpp::Publisher<moveit_msgs::msg::DisplayTrajectory>::SharedPtr display_pub_;
-    moveit_msgs::msg::DisplayTrajectory display_msg_;
     
 };
 

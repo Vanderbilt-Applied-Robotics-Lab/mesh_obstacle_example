@@ -5,6 +5,33 @@ MeshObstaclePlanner::MeshObstaclePlanner() : Node("mesh_obstacle_planner")
     display_pub_ = this->create_publisher<moveit_msgs::msg::DisplayTrajectory>("/display_planned_path", 10);
 }
 
+
+void MeshObstaclePlanner::mainRobotMotion()
+{
+    rclcpp::sleep_for(std::chrono::seconds(1));
+
+    initMoveGroup();
+
+    rclcpp::sleep_for(std::chrono::seconds(2));
+
+    bool success = planMotionAndVisualize(start_joints_);
+
+    rclcpp::sleep_for(std::chrono::seconds(10)); // wait for visualization
+    if (success)
+    {
+        moveJoints();
+    }
+
+    addMeshObstacle();
+
+    success = planMotionAndVisualize(goal_joints_);
+    rclcpp::sleep_for(std::chrono::seconds(10)); // wait for visualization
+    if (success)
+    {
+        moveJoints();
+    }
+}
+
 void MeshObstaclePlanner::initMoveGroup()
 {
     // initialize movegroup
@@ -15,6 +42,7 @@ void MeshObstaclePlanner::initMoveGroup()
     move_group_->setPlanningTime(300.0);
 
 }
+
 
 void MeshObstaclePlanner::addMeshObstacle()
 {
@@ -42,10 +70,13 @@ void MeshObstaclePlanner::addMeshObstacle()
 
 
     geometry_msgs::msg::Pose pose;
-    pose.position.x = 0.5;
-    pose.position.y = 0.5;
-    pose.position.z = 0.5;
-    pose.orientation.w = 0.5;
+    pose.position.x = 0.200;
+    pose.position.y = 0.0;
+    pose.position.z = 0.100;
+    pose.orientation.w = 0.7071068;
+    pose.orientation.x = 0.7071068;
+    pose.orientation.y = 0.0;
+    pose.orientation.z = 0.0;
 
     obj.meshes.push_back(mesh_msg);
     obj.mesh_poses.push_back(pose);
@@ -56,18 +87,21 @@ void MeshObstaclePlanner::addMeshObstacle()
     RCLCPP_INFO(this->get_logger(), "Mesh obstacle added");
 }
 
-bool MeshObstaclePlanner::planMotionAndVisualize()
+bool MeshObstaclePlanner::planMotionAndVisualize(std::vector<double> & joints)
 {
-        // set movegroup to target joint angles
-    move_group_->setJointValueTarget(target_joints_);
+    // message to display trajectory
+    moveit_msgs::msg::DisplayTrajectory display_msg;
+    
+    // set movegroup to target joint angles
+    move_group_->setJointValueTarget(joints);
 
     // if move plan succeeded, move robot
     if (move_group_->plan(plan_) == moveit::core::MoveItErrorCode::SUCCESS)
     {
-        display_msg_.trajectory_start = plan_.start_state;
-        display_msg_.trajectory.push_back(plan_.trajectory);
-        display_pub_->publish(display_msg_);
-        
+        display_msg.trajectory_start = plan_.start_state_;
+        display_msg.trajectory.push_back(plan_.trajectory_);
+        display_pub_->publish(display_msg);
+
         return true;
     }
     else // print error otherwise
@@ -88,19 +122,8 @@ int main(int argc, char** argv)
 
     auto node = std::make_shared<MeshObstaclePlanner>();
 
-    rclcpp::sleep_for(std::chrono::seconds(1));
+    node->mainRobotMotion();
 
-    node->addMeshObstacle();
-
-    rclcpp::sleep_for(std::chrono::seconds(2));
-    
-    bool success = node->planMotionAndVisualize();
-    if (success)
-    {
-        rclcpp::sleep_for(std::chrono::seconds(30)); // wait for visualization
-        node->moveJoints();
-    }
-    rclcpp::sleep_for(std::chrono::seconds(2));
     rclcpp::shutdown();
     
 
