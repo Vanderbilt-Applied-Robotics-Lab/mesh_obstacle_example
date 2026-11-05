@@ -8,15 +8,12 @@ MeshObstaclePlanner::MeshObstaclePlanner() : Node("mesh_obstacle_planner")
 
 void MeshObstaclePlanner::mainRobotMotion()
 {
-    rclcpp::sleep_for(std::chrono::seconds(1));
 
     initMoveGroup();
 
-    rclcpp::sleep_for(std::chrono::seconds(2));
-
     bool success = planMotionAndVisualize(start_joints_);
 
-    rclcpp::sleep_for(std::chrono::seconds(10)); // wait for visualization
+    rclcpp::sleep_for(std::chrono::seconds(3)); // wait for visualization
     if (success)
     {
         moveJoints();
@@ -25,7 +22,7 @@ void MeshObstaclePlanner::mainRobotMotion()
     addMeshObstacle();
 
     success = planMotionAndVisualize(goal_joints_);
-    rclcpp::sleep_for(std::chrono::seconds(10)); // wait for visualization
+    rclcpp::sleep_for(std::chrono::seconds(5)); // wait for visualization
     if (success)
     {
         moveJoints();
